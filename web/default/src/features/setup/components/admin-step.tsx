@@ -40,9 +40,9 @@ export function AdminStep({ form, rootInitialized }: AdminStepProps) {
   const { t } = useTranslation()
   if (rootInitialized) {
     return (
-      <Alert className='border-sky-200 bg-sky-50 dark:border-sky-900/60 dark:bg-sky-950/40'>
+      <Alert className='border-emerald-200 bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/35'>
         <AlertDescription className='flex items-start gap-2'>
-          <ShieldCheck className='mt-0.5 size-4 text-sky-500' />
+          <ShieldCheck className='mt-0.5 size-4 text-emerald-600 dark:text-emerald-300' />
           {t(
             'The administrator account is already initialized. You can keep your existing credentials and continue to the next step.'
           )}

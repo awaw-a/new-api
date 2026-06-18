@@ -27,6 +27,7 @@ import {
   getModelPriceItems,
   getLobeHubIcon,
 } from '../../../../../helpers';
+import { ModelPerformanceMetrics } from '../../utils/PerformanceMetrics';
 import {
   renderLimitedItems,
   renderDescription,
@@ -228,6 +229,14 @@ export const getPricingTableColumns = ({
     },
   };
 
+  const performanceColumn = {
+    title: t('性能指标'),
+    dataIndex: 'perf_metrics',
+    render: (text, record) => (
+      <ModelPerformanceMetrics metrics={record.perf_metrics} t={t} />
+    ),
+  };
+
   const priceColumn = {
     title: siteDisplayType === 'TOKENS' ? t('计费摘要') : t('模型价格'),
     dataIndex: 'model_price',
@@ -251,6 +260,7 @@ export const getPricingTableColumns = ({
 
   const columns = [...baseColumns];
   columns.push(endpointColumn);
+  columns.push(performanceColumn);
   if (showRatio) {
     columns.push(ratioColumn);
   }

@@ -20,6 +20,69 @@
   --sidebar-current-width: var(--sidebar-width);
 }
 
+body:not([theme-mode='dark']) {
+  --semi-color-primary: #007a37;
+  --semi-color-primary-hover: #008f45;
+  --semi-color-primary-active: #005c28;
+  --semi-color-primary-disabled: rgba(0, 122, 55, 0.35);
+  --semi-color-primary-light-default: rgba(0, 122, 55, 0.08);
+  --semi-color-primary-light-hover: rgba(0, 122, 55, 0.14);
+  --semi-color-primary-light-active: rgba(0, 122, 55, 0.22);
+  --semi-color-info: #008f45;
+  --semi-color-info-hover: #00a854;
+  --semi-color-info-active: #007a37;
+  --semi-color-info-disabled: rgba(0, 143, 69, 0.35);
+  --semi-color-info-light-default: rgba(0, 143, 69, 0.08);
+  --semi-color-info-light-hover: rgba(0, 143, 69, 0.14);
+  --semi-color-info-light-active: rgba(0, 143, 69, 0.22);
+  --semi-color-link: #007a37;
+  --semi-color-link-hover: #008f45;
+  --semi-color-link-active: #005c28;
+  --semi-color-link-visited: #007a37;
+  --semi-color-focus-border: #16a34a;
+  --semi-color-bg-0: #f2fef4;
+  --semi-color-bg-1: #f6fff8;
+  --semi-color-bg-2: #fbfffc;
+  --semi-color-bg-3: #ffffff;
+  --semi-color-bg-4: #ffffff;
+  --semi-color-nav-bg: #eefbef;
+  --semi-color-border: rgba(0, 109, 48, 0.14);
+  --semi-color-fill-0: rgba(0, 122, 55, 0.05);
+  --semi-color-fill-1: rgba(0, 122, 55, 0.08);
+  --semi-color-fill-2: rgba(0, 122, 55, 0.12);
+  --semi-color-shadow: rgba(0, 78, 35, 0.12);
+  --semi-color-data-0: #007a37;
+  --semi-color-data-2: #10b981;
+  --semi-color-data-4: #84cc16;
+  --semi-color-data-6: #14b8a6;
+}
+
+body[theme-mode='dark'] {
+  --semi-color-primary: #4ade80;
+  --semi-color-primary-hover: #6ee7a0;
+  --semi-color-primary-active: #22c55e;
+  --semi-color-primary-disabled: rgba(74, 222, 128, 0.35);
+  --semi-color-primary-light-default: rgba(74, 222, 128, 0.16);
+  --semi-color-primary-light-hover: rgba(74, 222, 128, 0.24);
+  --semi-color-primary-light-active: rgba(74, 222, 128, 0.32);
+  --semi-color-info: #4fce74;
+  --semi-color-info-hover: #6ee7a0;
+  --semi-color-info-active: #22c55e;
+  --semi-color-info-disabled: rgba(79, 206, 116, 0.35);
+  --semi-color-info-light-default: rgba(79, 206, 116, 0.16);
+  --semi-color-info-light-hover: rgba(79, 206, 116, 0.24);
+  --semi-color-info-light-active: rgba(79, 206, 116, 0.32);
+  --semi-color-link: #4ade80;
+  --semi-color-link-hover: #86efac;
+  --semi-color-link-active: #22c55e;
+  --semi-color-link-visited: #4ade80;
+  --semi-color-focus-border: #4ade80;
+  --semi-color-data-0: #4ade80;
+  --semi-color-data-2: #34d399;
+  --semi-color-data-4: #a3e635;
+  --semi-color-data-6: #2dd4bf;
+}
+
 body.sidebar-collapsed {
   --sidebar-current-width: var(--sidebar-width-collapsed);
 }
@@ -178,12 +241,12 @@ code {
 }
 
 .sidebar-nav-item:hover {
-  background-color: rgba(var(--semi-blue-0), 0.08);
+  background-color: var(--semi-color-primary-light-default);
   color: var(--semi-color-primary);
 }
 
 .sidebar-nav-item-selected {
-  background-color: rgba(var(--semi-blue-0), 0.12);
+  background-color: var(--semi-color-primary-light-hover);
   color: var(--semi-color-primary);
   font-weight: 500;
 }
@@ -713,6 +776,7 @@ html.dark .sbg-variant-green {
 }
 
 .shine-text {
+  color: var(--semi-color-primary);
   background: linear-gradient(
     90deg,
     currentColor 0%,
@@ -780,8 +844,7 @@ html.dark .sbg-variant-green {
 }
 
 .blur-ball-indigo {
-  background: #6366f1;
-  /* indigo-500 */
+  background: #34d399;
   top: 40px;
   left: 50%;
   transform: translateX(-50%);
@@ -789,8 +852,7 @@ html.dark .sbg-variant-green {
 }
 
 .blur-ball-teal {
-  background: #14b8a6;
-  /* teal-400 */
+  background: #a3e635;
   top: 200px;
   left: 30%;
   opacity: 0.4;
@@ -979,9 +1041,9 @@ html.dark .with-pastel-balls::before {
 
 /* ==================== 使用日志: channel affinity tag ==================== */
 .semi-tag.channel-affinity-tag {
-  border: 1px solid rgba(var(--semi-cyan-5), 0.35);
-  background-color: rgba(var(--semi-cyan-5), 0.15);
-  color: rgba(var(--semi-cyan-9), 1);
+  border: 1px solid var(--semi-color-primary-light-active);
+  background-color: var(--semi-color-primary-light-default);
+  color: var(--semi-color-primary);
   cursor: help;
   transition:
     background-color 120ms ease,
@@ -990,13 +1052,13 @@ html.dark .with-pastel-balls::before {
 }
 
 .semi-tag.channel-affinity-tag:hover {
-  background-color: rgba(var(--semi-cyan-5), 0.22);
-  border-color: rgba(var(--semi-cyan-5), 0.6);
-  box-shadow: 0 0 0 2px rgba(var(--semi-cyan-5), 0.18);
+  background-color: var(--semi-color-primary-light-hover);
+  border-color: var(--semi-color-primary);
+  box-shadow: 0 0 0 2px var(--semi-color-primary-light-active);
 }
 
 .semi-tag.channel-affinity-tag:active {
-  background-color: rgba(var(--semi-cyan-5), 0.28);
+  background-color: var(--semi-color-primary-light-active);
 }
 
 .semi-tag.channel-affinity-tag .channel-affinity-tag-content {

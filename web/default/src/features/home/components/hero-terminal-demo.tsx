@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
-type AccentTone = 'emerald' | 'amber' | 'blue' | 'violet'
+type AccentTone = 'emerald' | 'amber' | 'mint' | 'lime'
 
 interface ApiDemoConfig {
   id: string
@@ -55,17 +55,17 @@ const ACCENT_CLASSES: Record<
     badge:
       'bg-amber-500/10 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400',
   },
-  blue: {
-    activeText: 'text-blue-600 dark:text-blue-400',
-    activeBorder: 'border-blue-500 dark:border-blue-400',
+  mint: {
+    activeText: 'text-teal-700 dark:text-emerald-300',
+    activeBorder: 'border-teal-500 dark:border-emerald-300',
     badge:
-      'bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400',
+      'bg-teal-500/10 text-teal-700 dark:bg-emerald-300/10 dark:text-emerald-300',
   },
-  violet: {
-    activeText: 'text-violet-600 dark:text-violet-400',
-    activeBorder: 'border-violet-500 dark:border-violet-400',
+  lime: {
+    activeText: 'text-lime-700 dark:text-lime-300',
+    activeBorder: 'border-lime-500 dark:border-lime-300',
     badge:
-      'bg-violet-500/10 text-violet-600 dark:bg-violet-400/10 dark:text-violet-400',
+      'bg-lime-500/10 text-lime-700 dark:bg-lime-300/10 dark:text-lime-300',
   },
 }
 
@@ -133,7 +133,7 @@ const API_DEMOS: ApiDemoConfig[] = [
     responseHighlights: ['<text>', '<in>', '<out>'],
     tokens: 29,
     latency: 156,
-    accent: 'blue',
+    accent: 'mint',
   },
   {
     id: 'gemini',
@@ -156,7 +156,7 @@ const API_DEMOS: ApiDemoConfig[] = [
     responseHighlights: ['<text>', '<tokens>'],
     tokens: 25,
     latency: 93,
-    accent: 'violet',
+    accent: 'lime',
   },
 ]
 
@@ -511,13 +511,15 @@ function Command(props: { children: ReactNode }) {
 
 function Flag(props: { children: ReactNode }) {
   return (
-    <span className='text-blue-600 dark:text-blue-400'>{props.children}</span>
+    <span className='text-emerald-700 dark:text-emerald-300'>
+      {props.children}
+    </span>
   )
 }
 
 function Key(props: { children: ReactNode }) {
   return (
-    <span className='text-sky-700 dark:text-sky-300'>{props.children}</span>
+    <span className='text-teal-700 dark:text-teal-300'>{props.children}</span>
   )
 }
 
@@ -529,7 +531,7 @@ function StringText(props: { children: ReactNode }) {
 
 function NumberText(props: { children: ReactNode }) {
   return (
-    <span className='font-medium text-violet-600 dark:text-violet-300'>
+    <span className='font-medium text-lime-700 dark:text-lime-300'>
       {props.children}
     </span>
   )

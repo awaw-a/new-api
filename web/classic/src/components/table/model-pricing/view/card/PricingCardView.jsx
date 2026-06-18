@@ -42,6 +42,7 @@ import {
   getLobeHubIcon,
 } from '../../../../../helpers';
 import PricingCardSkeleton from './PricingCardSkeleton';
+import { ModelPerformanceMetrics } from '../../utils/PerformanceMetrics';
 import { useMinimumLoadingTime } from '../../../../../hooks/common/useMinimumLoadingTime';
 import { renderLimitedItems } from '../../../../common/ui/RenderUtils';
 import { useIsMobile } from '../../../../../hooks/common/useIsMobile';
@@ -315,6 +316,17 @@ const PricingCardView = ({
 
                 {/* 底部区域 */}
                 <div className='mt-auto'>
+                  <div
+                    className='border-t pt-3 mb-3'
+                    style={{ borderColor: 'var(--semi-color-border)' }}
+                  >
+                    <ModelPerformanceMetrics
+                      metrics={model.perf_metrics}
+                      t={t}
+                      variant='card'
+                    />
+                  </div>
+
                   {/* 标签区域 */}
                   {renderTags(model)}
 

@@ -23,6 +23,10 @@ import { API, copy, showError, showInfo, showSuccess } from '../../helpers';
 import { Modal } from '@douyinfe/semi-ui';
 import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
+import {
+  buildModelPerformanceMap,
+  MODEL_PERFORMANCE_HOURS,
+} from '../../components/table/model-pricing/utils/PerformanceMetrics';
 
 export const useModelPricingData = () => {
   const { t } = useTranslation();
@@ -192,11 +196,17 @@ export const useModelPricingData = () => {
     return `$${priceInUSD.toFixed(3)}`;
   };
 
-  const setModelsFormat = (models, groupRatio, vendorMap) => {
+  const setModelsFormat = (
+    models,
+    groupRatio,
+    vendorMap,
+    performanceMetricsMap = {},
+  ) => {
     for (let i = 0; i < models.length; i++) {
       const m = models[i];
       m.key = m.model_name;
       m.group_ratio = groupRatio[m.model_name];
+      m.perf_metrics = performanceMetricsMap[m.model_name] || null;
 
       if (m.vendor_id && vendorMap[m.vendor_id]) {
         const vendor = vendorMap[m.vendor_id];
@@ -225,10 +235,27 @@ export const useModelPricingData = () => {
     setModels(models);
   };
 
+  const loadPerformanceMetrics = async () => {
+    try {
+      const res = await API.get(
+        `/api/perf-metrics/summary?hours=${MODEL_PERFORMANCE_HOURS}`,
+      );
+      if (res.data?.success) {
+        return buildModelPerformanceMap(res.data.data);
+      }
+    } catch (error) {
+      console.warn('Failed to load model performance metrics', error);
+    }
+    return {};
+  };
+
   const loadPricing = async () => {
     setLoading(true);
     let url = '/api/pricing';
-    const res = await API.get(url);
+    const [res, performanceMetricsMap] = await Promise.all([
+      API.get(url),
+      loadPerformanceMetrics(),
+    ]);
     const {
       success,
       message,
@@ -253,7 +280,7 @@ export const useModelPricingData = () => {
       setVendorsMap(vendorMap);
       setEndpointMap(supported_endpoint || {});
       setAutoGroups(auto_groups || []);
-      setModelsFormat(data, group_ratio, vendorMap);
+      setModelsFormat(data, group_ratio, vendorMap, performanceMetricsMap);
     } else {
       showError(message);
     }

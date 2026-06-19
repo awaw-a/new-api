@@ -52,6 +52,7 @@ import SetupCheck from './components/layout/SetupCheck';
 
 const Home = lazy(() => import('./pages/Home'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Rankings = lazy(() => import('./pages/Rankings'));
 const About = lazy(() => import('./pages/About'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -85,6 +86,22 @@ function App() {
       }
     }
     return false; // 默认不需要登录
+  }, [statusState?.status?.HeaderNavModules]);
+
+  const rankingsRequireAuth = useMemo(() => {
+    const headerNavModulesConfig = statusState?.status?.HeaderNavModules;
+    if (!headerNavModulesConfig) {
+      return false;
+    }
+    try {
+      const modules = JSON.parse(headerNavModulesConfig);
+      return typeof modules.rankings === 'object'
+        ? modules.rankings.requireAuth === true
+        : false;
+    } catch (error) {
+      console.error('Failed to parse rankings navigation config:', error);
+      return false;
+    }
   }, [statusState?.status?.HeaderNavModules]);
 
   return (
@@ -340,6 +357,22 @@ function App() {
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <About />
             </Suspense>
+          }
+        />
+        <Route
+          path='/rankings'
+          element={
+            rankingsRequireAuth ? (
+              <PrivateRoute>
+                <Suspense fallback={<Loading />} key={location.pathname}>
+                  <Rankings />
+                </Suspense>
+              </PrivateRoute>
+            ) : (
+              <Suspense fallback={<Loading />} key={location.pathname}>
+                <Rankings />
+              </Suspense>
+            )
           }
         />
         <Route

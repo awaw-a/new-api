@@ -36,9 +36,9 @@ func TestUserRankingQueriesAggregateConsumeLogsByUser(t *testing.T) {
 
 	daily, err := GetUserRankingSummary(now-24*3600, now+1)
 	require.NoError(t, err)
-	assert.Equal(t, UserRankingSummary{RequestCount: 3, TotalQuota: 390, TotalTokens: 120}, daily)
+	assert.Equal(t, UserRankingSummary{RequestCount: 3, TotalQuota: 390, TotalTokens: 120, FirstRequestAt: now - 180}, daily)
 
 	allTime, err := GetUserRankingSummary(0, now+1)
 	require.NoError(t, err)
-	assert.Equal(t, UserRankingSummary{RequestCount: 4, TotalQuota: 1389, TotalTokens: 122}, allTime)
+	assert.Equal(t, UserRankingSummary{RequestCount: 4, TotalQuota: 1389, TotalTokens: 122, FirstRequestAt: now - 48*3600}, allTime)
 }

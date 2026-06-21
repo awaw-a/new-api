@@ -11,9 +11,10 @@ type UserRankingAggregate struct {
 }
 
 type UserRankingSummary struct {
-	RequestCount int64 `json:"request_count" gorm:"column:request_count"`
-	TotalQuota   int64 `json:"total_quota" gorm:"column:total_quota"`
-	TotalTokens  int64 `json:"total_tokens" gorm:"column:total_tokens"`
+	RequestCount   int64 `json:"request_count" gorm:"column:request_count"`
+	TotalQuota     int64 `json:"total_quota" gorm:"column:total_quota"`
+	TotalTokens    int64 `json:"total_tokens" gorm:"column:total_tokens"`
+	FirstRequestAt int64 `json:"first_request_at" gorm:"column:first_request_at"`
 }
 
 func GetUserRankingAggregates(startTime int64, endTime int64) ([]UserRankingAggregate, error) {
@@ -34,7 +35,8 @@ func GetUserRankingSummary(startTime int64, endTime int64) (UserRankingSummary, 
 	query := applyUserRankingTimeRange(userRankingConsumeQuery(), startTime, endTime).
 		Select(`COUNT(*) AS request_count,
 			COALESCE(SUM(quota), 0) AS total_quota,
-			COALESCE(SUM(prompt_tokens), 0) + COALESCE(SUM(completion_tokens), 0) AS total_tokens`)
+			COALESCE(SUM(prompt_tokens), 0) + COALESCE(SUM(completion_tokens), 0) AS total_tokens,
+			COALESCE(MIN(created_at), 0) AS first_request_at`)
 	err := query.Scan(&summary).Error
 	return summary, err
 }

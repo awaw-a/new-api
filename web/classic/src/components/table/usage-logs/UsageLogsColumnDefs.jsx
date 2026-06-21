@@ -836,7 +836,7 @@ export const getLogsColumns = ({
           {t('IP')}
           <Tooltip
             content={t(
-              '只有当用户设置开启IP记录时，才会进行请求和错误类型日志的IP记录',
+              '站点已强制记录所有用户的消费与错误日志客户端IP，无法关闭',
             )}
           >
             <IconHelpCircle className='text-gray-400 cursor-help' />

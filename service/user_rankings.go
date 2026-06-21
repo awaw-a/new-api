@@ -1,6 +1,7 @@
 package service
 
 import (
+	"math"
 	"sort"
 	"sync"
 	"time"
@@ -11,10 +12,10 @@ import (
 const (
 	userRankingCacheTTL = 5 * time.Minute
 	userRankingLimit    = 10
-	userRankingMinutes  = 24 * 60
 )
 
 type UserRankingsResponse struct {
+	Period          string              `json:"period"`
 	Summary         UserRankingsSummary `json:"summary"`
 	RequestRankings []RankedUser        `json:"request_rankings"`
 	QuotaRankings   []RankedUser        `json:"quota_rankings"`
@@ -22,6 +23,9 @@ type UserRankingsResponse struct {
 }
 
 type UserRankingsSummary struct {
+	Requests        int64   `json:"requests"`
+	Quota           int64   `json:"quota"`
+	Tokens          int64   `json:"tokens"`
 	Requests24H     int64   `json:"requests_24h"`
 	Quota24H        int64   `json:"quota_24h"`
 	Tokens24H       int64   `json:"tokens_24h"`
@@ -47,54 +51,92 @@ type userRankingCacheItem struct {
 
 var (
 	userRankingCacheMu sync.Mutex
-	userRankingCache   userRankingCacheItem
+	userRankingCache   = map[string]userRankingCacheItem{}
 )
 
-func GetUserRankingsSnapshot() (*UserRankingsResponse, error) {
+func GetUserRankingsSnapshot(period string) (*UserRankingsResponse, error) {
+	config, err := rankingConfig(period)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
 	userRankingCacheMu.Lock()
-	if userRankingCache.data != nil && now.Before(userRankingCache.expiresAt) {
-		data := userRankingCache.data
+	if item, ok := userRankingCache[config.id]; ok && item.data != nil && now.Before(item.expiresAt) {
+		data := item.data
 		userRankingCacheMu.Unlock()
 		return data, nil
 	}
 	userRankingCacheMu.Unlock()
 
-	startTime := now.Add(-24 * time.Hour).Unix()
-	endTime := now.Unix()
+	startTime, endTime := rankingTimeRange(config, now)
 	rows, err := model.GetUserRankingAggregates(startTime, endTime)
 	if err != nil {
 		return nil, err
 	}
-	dailySummary, err := model.GetUserRankingSummary(startTime, endTime)
-	if err != nil {
-		return nil, err
-	}
-	allTimeSummary, err := model.GetUserRankingSummary(0, endTime)
+	periodSummary, err := model.GetUserRankingSummary(startTime, endTime)
 	if err != nil {
 		return nil, err
 	}
 
+	dailySummary := periodSummary
+	if config.id != "today" {
+		dailySummary, err = model.GetUserRankingSummary(now.Add(-24*time.Hour).Unix(), endTime)
+		if err != nil {
+			return nil, err
+		}
+	}
+	allTimeSummary := periodSummary
+	if config.id != "all" {
+		allTimeSummary, err = model.GetUserRankingSummary(0, endTime)
+		if err != nil {
+			return nil, err
+		}
+	}
+	periodMinutes := userRankingPeriodMinutes(config, periodSummary, now)
+
 	result := &UserRankingsResponse{
+		Period: config.id,
 		Summary: UserRankingsSummary{
+			Requests:        periodSummary.RequestCount,
+			Quota:           periodSummary.TotalQuota,
+			Tokens:          periodSummary.TotalTokens,
 			Requests24H:     dailySummary.RequestCount,
 			Quota24H:        dailySummary.TotalQuota,
 			Tokens24H:       dailySummary.TotalTokens,
 			RequestsAllTime: allTimeSummary.RequestCount,
 			QuotaAllTime:    allTimeSummary.TotalQuota,
 			TokensAllTime:   allTimeSummary.TotalTokens,
-			AverageRPM:      roundRankingFloat(float64(dailySummary.RequestCount) / userRankingMinutes),
-			AverageTPM:      roundRankingFloat(float64(dailySummary.TotalTokens) / userRankingMinutes),
+			AverageRPM:      roundUserRankingRate(float64(periodSummary.RequestCount) / periodMinutes),
+			AverageTPM:      roundUserRankingRate(float64(periodSummary.TotalTokens) / periodMinutes),
 		},
-		RequestRankings: buildRankedUsers(rows, dailySummary.RequestCount, func(row model.UserRankingAggregate) int64 { return row.RequestCount }),
-		QuotaRankings:   buildRankedUsers(rows, dailySummary.TotalQuota, func(row model.UserRankingAggregate) int64 { return row.TotalQuota }),
-		TokenRankings:   buildRankedUsers(rows, dailySummary.TotalTokens, func(row model.UserRankingAggregate) int64 { return row.TotalTokens }),
+		RequestRankings: buildRankedUsers(rows, periodSummary.RequestCount, func(row model.UserRankingAggregate) int64 { return row.RequestCount }),
+		QuotaRankings:   buildRankedUsers(rows, periodSummary.TotalQuota, func(row model.UserRankingAggregate) int64 { return row.TotalQuota }),
+		TokenRankings:   buildRankedUsers(rows, periodSummary.TotalTokens, func(row model.UserRankingAggregate) int64 { return row.TotalTokens }),
 	}
 
 	userRankingCacheMu.Lock()
-	userRankingCache = userRankingCacheItem{expiresAt: now.Add(userRankingCacheTTL), data: result}
+	userRankingCache[config.id] = userRankingCacheItem{expiresAt: now.Add(userRankingCacheTTL), data: result}
 	userRankingCacheMu.Unlock()
 	return result, nil
+}
+
+func roundUserRankingRate(value float64) float64 {
+	return math.Round(value*1_000_000) / 1_000_000
+}
+
+func userRankingPeriodMinutes(config rankingPeriodConfig, summary model.UserRankingSummary, now time.Time) float64 {
+	if config.duration > 0 {
+		return config.duration.Minutes()
+	}
+	if summary.FirstRequestAt <= 0 {
+		return 1
+	}
+	minutes := now.Sub(time.Unix(summary.FirstRequestAt, 0)).Minutes()
+	if minutes < 1 {
+		return 1
+	}
+	return minutes
 }
 
 func buildRankedUsers(rows []model.UserRankingAggregate, total int64, valueOf func(model.UserRankingAggregate) int64) []RankedUser {

@@ -78,7 +78,8 @@ const formatRate = (value) => {
   if (number >= 1000) {
     return formatTokens(number);
   }
-  return number.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const maximumFractionDigits = number > 0 && number < 0.01 ? 6 : number < 1 ? 4 : 2;
+  return number.toLocaleString(undefined, { maximumFractionDigits });
 };
 
 const periodLabels = (t) => ({
@@ -105,7 +106,7 @@ const Rankings = () => {
     setError('');
     try {
       const response = await API.get(view === 'users' ? '/api/rankings/users' : '/api/rankings', {
-        ...(view === 'users' ? {} : { params: { period } }),
+        params: { period },
         signal,
       });
       if (!response.data?.success) {
@@ -132,15 +133,25 @@ const Rankings = () => {
   }, [loadRankings]);
 
   const handlePeriodChange = (nextPeriod) => {
-    setSearchParams(nextPeriod === 'week' ? {} : { period: nextPeriod });
+    const params = {};
+    if (view === 'users') {
+      params.view = 'users';
+    }
+    if (nextPeriod !== 'week') {
+      params.period = nextPeriod;
+    }
+    setSearchParams(params);
   };
 
   const handleViewChange = (nextView) => {
+    const params = {};
     if (nextView === 'users') {
-      setSearchParams({ view: 'users' });
-      return;
+      params.view = 'users';
     }
-    setSearchParams(period === 'week' ? {} : { period });
+    if (period !== 'week') {
+      params.period = period;
+    }
+    setSearchParams(params);
   };
 
   const labels = periodLabels(t);
@@ -153,7 +164,7 @@ const Rankings = () => {
           <h1>{view === 'users' ? t('\u7528\u6237\u6392\u884c\u699c') : t('\u6a21\u578b\u8c03\u7528\u6392\u884c\u699c')}</h1>
           <p>
             {view === 'users'
-              ? t('\u67e5\u770b\u8fc7\u53bb 24 \u5c0f\u65f6\u7684\u7528\u6237\u8c03\u7528\u4e0e\u6d88\u8017\u6392\u884c\u3002')
+              ? t('\u67e5\u770b\u6240\u9009\u5468\u671f\u5185\u7684\u7528\u6237\u8c03\u7528\u4e0e\u6d88\u8017\u6392\u884c\u3002')
               : t('\u53d1\u73b0\u7ad9\u70b9\u4e0a\u6700\u5e38\u7528\u7684\u6a21\u578b\u548c\u6b63\u5728\u589e\u957f\u7684\u4f9b\u5e94\u5546\uff0c\u6570\u636e\u57fa\u4e8e\u771f\u5b9e\u4f7f\u7528\u91cf\u5b9a\u65f6\u66f4\u65b0\u3002')}
           </p>
         </header>
@@ -167,22 +178,20 @@ const Rankings = () => {
           </button>
         </div>
 
-        {view === 'models' && (
-          <div className='rankings-periods' role='tablist' aria-label={t('\u7edf\u8ba1\u5468\u671f')}>
-            {PERIODS.map((item) => (
-              <button
-                key={item}
-                type='button'
-                role='tab'
-                aria-selected={period === item}
-                className={period === item ? 'rankings-period-active' : ''}
-                onClick={() => handlePeriodChange(item)}
-              >
-                {labels[item]}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className='rankings-periods' role='tablist' aria-label={t('\u7edf\u8ba1\u5468\u671f')}>
+          {PERIODS.map((item) => (
+            <button
+              key={item}
+              type='button'
+              role='tab'
+              aria-selected={period === item}
+              className={period === item ? 'rankings-period-active' : ''}
+              onClick={() => handlePeriodChange(item)}
+            >
+              {labels[item]}
+            </button>
+          ))}
+        </div>
 
         {loading ? (
           <RankingsLoading t={t} />
@@ -190,7 +199,7 @@ const Rankings = () => {
           <RankingsError message={error} onRetry={() => loadRankings()} t={t} />
         ) : (
           view === 'users'
-            ? <UserRankingsContent snapshot={snapshot} t={t} />
+            ? <UserRankingsContent snapshot={snapshot} period={period} t={t} />
             : <RankingsContent snapshot={snapshot} period={period} actualTheme={actualTheme} t={t} />
         )}
       </main>
@@ -198,34 +207,36 @@ const Rankings = () => {
   );
 };
 
-const UserRankingsContent = ({ snapshot, t }) => {
+const UserRankingsContent = ({ snapshot, period, t }) => {
   const summary = snapshot?.summary || {};
+  const periodLabel = periodLabels(t)[period];
+  const showLifetime = period !== 'all';
   const cards = [
     {
-      label: t('24h \u603b\u8bf7\u6c42\u6570'),
-      value: formatTokens(summary.requests_24h),
-      lifetime: formatTokens(summary.requests_all_time),
+      label: `${periodLabel} · ${t('\u603b\u8bf7\u6c42\u6570')}`,
+      value: formatTokens(summary.requests ?? summary.requests_24h),
+      lifetime: showLifetime ? formatTokens(summary.requests_all_time) : undefined,
       icon: <Activity size={19} />,
     },
     {
-      label: t('24h \u603b\u989d\u5ea6'),
-      value: renderQuota(summary.quota_24h || 0),
-      lifetime: renderQuota(summary.quota_all_time || 0),
+      label: `${periodLabel} · ${t('\u603b\u989d\u5ea6')}`,
+      value: renderQuota(summary.quota ?? summary.quota_24h ?? 0),
+      lifetime: showLifetime ? renderQuota(summary.quota_all_time || 0) : undefined,
       icon: <Coins size={19} />,
     },
     {
-      label: t('24h \u603b Tokens'),
-      value: formatTokens(summary.tokens_24h),
-      lifetime: formatTokens(summary.tokens_all_time),
+      label: `${periodLabel} · ${t('\u603b Tokens')}`,
+      value: formatTokens(summary.tokens ?? summary.tokens_24h),
+      lifetime: showLifetime ? formatTokens(summary.tokens_all_time) : undefined,
       icon: <Gauge size={19} />,
     },
     {
-      label: t('24h \u5e73\u5747 RPM'),
+      label: `${periodLabel} · ${t('\u5e73\u5747 RPM')}`,
       value: formatRate(summary.average_rpm),
       icon: <BarChart3 size={19} />,
     },
     {
-      label: t('24h \u5e73\u5747 TPM'),
+      label: `${periodLabel} · ${t('\u5e73\u5747 TPM')}`,
       value: formatRate(summary.average_tpm),
       icon: <UsersRound size={19} />,
     },
@@ -233,19 +244,19 @@ const UserRankingsContent = ({ snapshot, t }) => {
   const rankings = [
     {
       title: t('\u7528\u6237\u8c03\u7528\u6b21\u6570\u6392\u884c'),
-      description: t('\u6309\u8fc7\u53bb 24 \u5c0f\u65f6\u8bf7\u6c42\u6570\u6392\u5e8f'),
+      description: t('\u6309\u6240\u9009\u5468\u671f\u8bf7\u6c42\u6570\u6392\u5e8f'),
       rows: snapshot?.request_rankings || [],
       formatter: formatTokens,
     },
     {
       title: t('\u7528\u6237\u989d\u5ea6\u6392\u884c'),
-      description: t('\u6309\u8fc7\u53bb 24 \u5c0f\u65f6\u989d\u5ea6\u6d88\u8017\u6392\u5e8f'),
+      description: t('\u6309\u6240\u9009\u5468\u671f\u989d\u5ea6\u6d88\u8017\u6392\u5e8f'),
       rows: snapshot?.quota_rankings || [],
       formatter: (value) => renderQuota(value),
     },
     {
       title: t('\u7528\u6237 Token \u6d88\u8017\u6392\u884c'),
-      description: t('\u6309\u8fc7\u53bb 24 \u5c0f\u65f6 Token \u6d88\u8017\u6392\u5e8f'),
+      description: t('\u6309\u6240\u9009\u5468\u671f Token \u6d88\u8017\u6392\u5e8f'),
       rows: snapshot?.token_rankings || [],
       formatter: formatTokens,
     },

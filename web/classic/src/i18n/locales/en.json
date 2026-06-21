@@ -3866,6 +3866,15 @@
     "按过去 24 小时 Token 消耗排序": "Ranked by tokens consumed over the past 24 hours",
     "用户调用概览": "User activity overview",
     "平台累计": "All-time",
-    "未知用户": "Unknown user"
+    "未知用户": "Unknown user",
+    "查看所选周期内的用户调用与消耗排行。": "View user calls and consumption rankings for the selected period.",
+    "总请求数": "Total requests",
+    "总 Tokens": "Total tokens",
+    "平均 RPM": "Average RPM",
+    "平均 TPM": "Average TPM",
+    "按所选周期请求数排序": "Ranked by requests in the selected period",
+    "按所选周期额度消耗排序": "Ranked by quota consumed in the selected period",
+    "按所选周期 Token 消耗排序": "Ranked by tokens consumed in the selected period",
+    "站点已强制记录所有用户的消费与错误日志客户端IP，无法关闭": "The site requires client IP logging for all users' consumption and error logs. This cannot be disabled."
   }
 }

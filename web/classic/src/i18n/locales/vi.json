@@ -4254,6 +4254,15 @@
     "按过去 24 小时 Token 消耗排序": "Xếp theo Token đã dùng trong 24 giờ qua",
     "用户调用概览": "Tổng quan hoạt động người dùng",
     "平台累计": "Toàn thời gian",
-    "未知用户": "Người dùng không xác định"
+    "未知用户": "Người dùng không xác định",
+    "查看所选周期内的用户调用与消耗排行。": "Xem xếp hạng lượt gọi và mức sử dụng của người dùng trong khoảng thời gian đã chọn.",
+    "总请求数": "Tổng số yêu cầu",
+    "总 Tokens": "Tổng số Token",
+    "平均 RPM": "RPM trung bình",
+    "平均 TPM": "TPM trung bình",
+    "按所选周期请求数排序": "Xếp theo số yêu cầu trong khoảng thời gian đã chọn",
+    "按所选周期额度消耗排序": "Xếp theo hạn mức đã dùng trong khoảng thời gian đã chọn",
+    "按所选周期 Token 消耗排序": "Xếp theo Token đã dùng trong khoảng thời gian đã chọn",
+    "站点已强制记录所有用户的消费与错误日志客户端IP，无法关闭": "Trang web bắt buộc ghi lại IP máy khách trong nhật ký sử dụng và lỗi của mọi người dùng. Không thể tắt tính năng này."
   }
 }

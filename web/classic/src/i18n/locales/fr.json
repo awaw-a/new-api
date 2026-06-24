@@ -400,6 +400,7 @@
     "仅对自定义模型有效": "Uniquement efficace pour les modèles personnalisés",
     "仅当前层": "Niveau actuel uniquement",
     "仅当自动禁用开启时有效，关闭后不会自动禁用该渠道": "Efficace uniquement lorsque la désactivation automatique est activée, après la fermeture, le canal ne sera pas automatiquement désactivé",
+    "仅限QQ邮箱注册": "Inscription réservée aux adresses e-mail QQ",
     "仅提交已勾选": "",
     "仅支持": "Seulement prend en charge",
     "仅支持 JSON 对象，必须包含 access_token 与 account_id": "Seuls les objets JSON sont pris en charge, doivent inclure access_token et account_id",

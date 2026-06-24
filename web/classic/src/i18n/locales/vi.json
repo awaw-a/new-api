@@ -395,6 +395,7 @@
     "仅对自定义模型有效": "Chỉ hiệu quả đối với các mô hình tùy chỉnh",
     "仅当前层": "Chỉ cấp hiện tại",
     "仅当自动禁用开启时有效，关闭后不会自动禁用该渠道": "Chỉ hiệu quả khi bật tự động vô hiệu hóa, sau khi đóng, kênh sẽ không bị tự động vô hiệu hóa",
+    "仅限QQ邮箱注册": "Chỉ đăng ký bằng email QQ",
     "仅提交已勾选": "",
     "仅支持": "Chỉ hỗ trợ",
     "仅支持 JSON 对象，必须包含 access_token 与 account_id": "Chỉ hỗ trợ đối tượng JSON, phải bao gồm access_token và account_id",

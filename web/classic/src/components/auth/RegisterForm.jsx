@@ -403,10 +403,16 @@ const RegisterForm = () => {
           </div>
 
           <Card className='border-0 !rounded-2xl overflow-hidden'>
-            <div className='flex justify-center pt-6 pb-2'>
+            <div className='flex flex-col items-center justify-center pt-6 pb-2 gap-1'>
               <Title heading={3} className='text-gray-800 dark:text-gray-200'>
                 {t('注 册')}
               </Title>
+              <Text
+                size='small'
+                className='!text-gray-500 dark:!text-gray-400'
+              >
+                {t('仅限QQ邮箱注册')}
+              </Text>
             </div>
             <div className='px-2 py-8'>
               <div className='space-y-3'>
@@ -566,10 +572,16 @@ const RegisterForm = () => {
           </div>
 
           <Card className='border-0 !rounded-2xl overflow-hidden'>
-            <div className='flex justify-center pt-6 pb-2'>
+            <div className='flex flex-col items-center justify-center pt-6 pb-2 gap-1'>
               <Title heading={3} className='text-gray-800 dark:text-gray-200'>
                 {t('注 册')}
               </Title>
+              <Text
+                size='small'
+                className='!text-gray-500 dark:!text-gray-400'
+              >
+                {t('仅限QQ邮箱注册')}
+              </Text>
             </div>
             <div className='px-2 py-8'>
               <Form className='space-y-3'>

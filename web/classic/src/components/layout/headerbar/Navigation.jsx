@@ -68,6 +68,9 @@ const Navigation = ({
       ) {
         targetPath = '/login';
       }
+      if (link.itemKey === 'games' && !userState.user) {
+        targetPath = '/login';
+      }
 
       return (
         <Link key={link.itemKey} to={targetPath} className={commonLinkClasses}>

@@ -46,6 +46,14 @@ export default function SettingsHeaderNavModules(props) {
       enabled: true,
       requireAuth: false, // 默认不需要登录鉴权
     },
+    rankings: {
+      enabled: true,
+      requireAuth: false,
+    },
+    games: {
+      enabled: true,
+      requireAuth: true,
+    },
     docs: true,
     about: true,
   });
@@ -54,7 +62,11 @@ export default function SettingsHeaderNavModules(props) {
   function handleHeaderNavModuleChange(moduleKey) {
     return (checked) => {
       const newModules = { ...headerNavModules };
-      if (moduleKey === 'pricing') {
+      if (
+        moduleKey === 'pricing' ||
+        moduleKey === 'rankings' ||
+        moduleKey === 'games'
+      ) {
         // 对于pricing模块，只更新enabled属性
         newModules[moduleKey] = {
           ...newModules[moduleKey],
@@ -85,6 +97,14 @@ export default function SettingsHeaderNavModules(props) {
       pricing: {
         enabled: true,
         requireAuth: false,
+      },
+      rankings: {
+        enabled: true,
+        requireAuth: false,
+      },
+      games: {
+        enabled: true,
+        requireAuth: true,
       },
       docs: true,
       about: true,
@@ -141,6 +161,28 @@ export default function SettingsHeaderNavModules(props) {
             requireAuth: false, // 默认不需要登录鉴权
           };
         }
+        if (typeof modules.rankings === 'boolean') {
+          modules.rankings = {
+            enabled: modules.rankings,
+            requireAuth: false,
+          };
+        } else if (!modules.rankings) {
+          modules.rankings = {
+            enabled: true,
+            requireAuth: false,
+          };
+        }
+        if (typeof modules.games === 'boolean') {
+          modules.games = {
+            enabled: modules.games,
+            requireAuth: true,
+          };
+        } else if (!modules.games) {
+          modules.games = {
+            enabled: true,
+            requireAuth: true,
+          };
+        }
 
         setHeaderNavModules(modules);
       } catch (error) {
@@ -151,6 +193,14 @@ export default function SettingsHeaderNavModules(props) {
           pricing: {
             enabled: true,
             requireAuth: false,
+          },
+          rankings: {
+            enabled: true,
+            requireAuth: false,
+          },
+          games: {
+            enabled: true,
+            requireAuth: true,
           },
           docs: true,
           about: true,
@@ -177,6 +227,16 @@ export default function SettingsHeaderNavModules(props) {
       title: t('模型广场'),
       description: t('模型定价，需要登录访问'),
       hasSubConfig: true, // 标识该模块有子配置
+    },
+    {
+      key: 'rankings',
+      title: t('排行榜'),
+      description: t('模型与用户调用数据统计'),
+    },
+    {
+      key: 'games',
+      title: t('小游戏'),
+      description: t('用户可通过小游戏获取额度'),
     },
     {
       key: 'docs',
@@ -245,7 +305,7 @@ export default function SettingsHeaderNavModules(props) {
                   <div style={{ marginLeft: '16px' }}>
                     <Switch
                       checked={
-                        module.key === 'pricing'
+                        typeof headerNavModules[module.key] === 'object'
                           ? headerNavModules[module.key]?.enabled
                           : headerNavModules[module.key]
                       }

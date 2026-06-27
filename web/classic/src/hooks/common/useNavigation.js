@@ -27,6 +27,10 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
       console: true,
       pricing: true,
       rankings: true,
+      games: {
+        enabled: true,
+        requireAuth: true,
+      },
       docs: true,
       about: true,
     };
@@ -51,9 +55,14 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
         to: '/pricing',
       },
       {
-        text: t('\u6392\u884c\u699c'),
+        text: t('排行榜'),
         itemKey: 'rankings',
         to: '/rankings',
+      },
+      {
+        text: t('小游戏'),
+        itemKey: 'games',
+        to: '/games',
       },
       ...(docsLink
         ? [
@@ -77,7 +86,11 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
       if (link.itemKey === 'docs') {
         return docsLink && modules.docs;
       }
-      if (link.itemKey === 'pricing' || link.itemKey === 'rankings') {
+      if (
+        link.itemKey === 'pricing' ||
+        link.itemKey === 'rankings' ||
+        link.itemKey === 'games'
+      ) {
         // 支持新的pricing配置格式
         const moduleConfig = modules[link.itemKey];
         return typeof moduleConfig === 'object'

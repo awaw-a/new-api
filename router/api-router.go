@@ -65,6 +65,14 @@ func SetApiRouter(router *gin.Engine) {
 		// Universal secure verification routes
 		apiRouter.POST("/verify", middleware.UserAuth(), middleware.CriticalRateLimit(), controller.UniversalVerify)
 
+		gameRoute := apiRouter.Group("/games")
+		gameRoute.Use(middleware.UserAuth())
+		{
+			gameRoute.GET("", controller.GetMiniGames)
+			gameRoute.POST("/tetris/start", middleware.CriticalRateLimit(), controller.StartTetrisGame)
+			gameRoute.POST("/tetris/claim", middleware.CriticalRateLimit(), controller.ClaimTetrisReward)
+		}
+
 		userRoute := apiRouter.Group("/user")
 		{
 			userRoute.POST("/register", middleware.CriticalRateLimit(), anonymousRequestBodyLimit, middleware.TurnstileCheck(), controller.Register)

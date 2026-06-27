@@ -53,6 +53,7 @@ import SetupCheck from './components/layout/SetupCheck';
 const Home = lazy(() => import('./pages/Home'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Rankings = lazy(() => import('./pages/Rankings'));
+const Games = lazy(() => import('./pages/Games'));
 const About = lazy(() => import('./pages/About'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -373,6 +374,16 @@ function App() {
                 <Rankings />
               </Suspense>
             )
+          }
+        />
+        <Route
+          path='/games'
+          element={
+            <PrivateRoute>
+              <Suspense fallback={<Loading />} key={location.pathname}>
+                <Games />
+              </Suspense>
+            </PrivateRoute>
           }
         />
         <Route

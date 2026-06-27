@@ -27,6 +27,7 @@ import SettingsLog from '../../pages/Setting/Operation/SettingsLog';
 import SettingsMonitoring from '../../pages/Setting/Operation/SettingsMonitoring';
 import SettingsCreditLimit from '../../pages/Setting/Operation/SettingsCreditLimit';
 import SettingsCheckin from '../../pages/Setting/Operation/SettingsCheckin';
+import SettingsMiniGames from '../../pages/Setting/Operation/SettingsMiniGames';
 import { API, showError, toBoolean } from '../../helpers';
 
 const OperationSetting = () => {
@@ -78,6 +79,12 @@ const OperationSetting = () => {
     'checkin_setting.enabled': false,
     'checkin_setting.min_quota': 1000,
     'checkin_setting.max_quota': 10000,
+
+    /* 小游戏设置 */
+    'mini_game_setting.enabled': false,
+    'mini_game_setting.tetris_enabled': true,
+    'mini_game_setting.tetris_score_per_quota': 100,
+    'mini_game_setting.daily_quota_limit': 1000,
 
     /* 令牌设置 */
     'token_setting.max_user_tokens': 1000,
@@ -153,6 +160,10 @@ const OperationSetting = () => {
         {/* 签到设置 */}
         <Card style={{ marginTop: '10px' }}>
           <SettingsCheckin options={inputs} refresh={onRefresh} />
+        </Card>
+        {/* 小游戏设置 */}
+        <Card style={{ marginTop: '10px' }}>
+          <SettingsMiniGames options={inputs} refresh={onRefresh} />
         </Card>
       </Spin>
     </>

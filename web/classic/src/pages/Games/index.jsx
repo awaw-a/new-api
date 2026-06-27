@@ -314,9 +314,12 @@ const Games = () => {
     () => gameInfo?.games?.find((game) => game.key === 'tetris'),
     [gameInfo],
   );
-  const scoreRewardPreview = Math.floor(
-    snapshot.score / Math.max(Number(tetris?.score_per_quota || 1), 1),
-  );
+  const quotaPerScoreValue = Number(tetris?.quota_per_score ?? 1);
+  const quotaPerScore =
+    Number.isFinite(quotaPerScoreValue) && quotaPerScoreValue > 0
+      ? quotaPerScoreValue
+      : 1;
+  const scoreRewardPreview = Math.floor(snapshot.score * quotaPerScore);
   const rewardPreview = Math.min(
     scoreRewardPreview,
     Number(gameInfo?.daily_remaining || 0),
@@ -603,9 +606,8 @@ const Games = () => {
                     <div>
                       <h2>{t('俄罗斯方块')}</h2>
                       <p>
-                        {t('每 {{score}} 分可领取 {{quota}} 额度', {
-                          score: tetris?.score_per_quota || 0,
-                          quota: renderQuota(1),
+                        {t('每 1 分对应 {{quota}} 额度', {
+                          quota: renderQuota(quotaPerScore, 6),
                         })}
                       </p>
                     </div>

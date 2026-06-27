@@ -35,7 +35,7 @@ export default function SettingsMiniGames(props) {
   const [inputs, setInputs] = useState({
     'mini_game_setting.enabled': false,
     'mini_game_setting.tetris_enabled': true,
-    'mini_game_setting.tetris_score_per_quota': 100,
+    'mini_game_setting.tetris_quota_per_score': 1,
     'mini_game_setting.daily_quota_limit': 1000,
   });
   const [inputsRow, setInputsRow] = useState(inputs);
@@ -123,13 +123,14 @@ export default function SettingsMiniGames(props) {
             </Col>
             <Col xs={24} sm={12} md={6} lg={6} xl={6}>
               <Form.InputNumber
-                field='mini_game_setting.tetris_score_per_quota'
-                label={t('每额度所需分数')}
-                placeholder={t('例如：100')}
-                min={1}
+                field='mini_game_setting.tetris_quota_per_score'
+                label={t('每分数对应额度')}
+                placeholder={t('例如：1')}
+                min={0.000001}
+                step={0.01}
                 disabled={!inputs['mini_game_setting.enabled']}
                 onChange={handleFieldChange(
-                  'mini_game_setting.tetris_score_per_quota',
+                  'mini_game_setting.tetris_quota_per_score',
                 )}
               />
             </Col>

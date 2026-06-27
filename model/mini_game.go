@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/QuantumNous/new-api/common"
@@ -208,7 +209,7 @@ func ClaimMiniGameReward(userId int, gameKey string, sessionToken string, score 
 	}
 
 	setting := operation_setting.GetMiniGameSetting()
-	if setting.TetrisScorePerQuota <= 0 {
+	if setting.TetrisQuotaPerScore <= 0 {
 		return nil, MiniGameDailyStats{}, errors.New("小游戏奖励比例配置无效")
 	}
 	if setting.DailyQuotaLimit <= 0 {
@@ -225,9 +226,9 @@ func ClaimMiniGameReward(userId int, gameKey string, sessionToken string, score 
 	}
 
 	playDate := todayMiniGameDate()
-	quotaByScore := score / setting.TetrisScorePerQuota
+	quotaByScore := int(math.Floor(float64(score) * setting.TetrisQuotaPerScore))
 	if quotaByScore <= 0 {
-		return nil, MiniGameDailyStats{}, fmt.Errorf("本局分数不足，至少需要 %d 分才能领取额度", setting.TetrisScorePerQuota)
+		return nil, MiniGameDailyStats{}, errors.New("本局分数不足，暂无法领取额度")
 	}
 
 	var play MiniGamePlay

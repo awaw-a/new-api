@@ -67,7 +67,7 @@ func GetMiniGames(c *gin.Context) {
 					"key":             model.MiniGameKeyTetris,
 					"name":            "俄罗斯方块",
 					"enabled":         setting.Enabled && setting.TetrisEnabled,
-					"score_per_quota": setting.TetrisScorePerQuota,
+					"quota_per_score": setting.TetrisQuotaPerScore,
 				},
 			},
 			"recent_plays": recentPlays,

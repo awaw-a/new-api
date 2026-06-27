@@ -83,7 +83,7 @@ const OperationSetting = () => {
     /* 小游戏设置 */
     'mini_game_setting.enabled': false,
     'mini_game_setting.tetris_enabled': true,
-    'mini_game_setting.tetris_score_per_quota': 100,
+    'mini_game_setting.tetris_quota_per_score': 1,
     'mini_game_setting.daily_quota_limit': 1000,
 
     /* 令牌设置 */

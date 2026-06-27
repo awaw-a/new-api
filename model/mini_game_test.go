@@ -10,14 +10,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func configureMiniGameForTest(t *testing.T, scorePerQuota int, dailyLimit int) {
+func configureMiniGameForTest(t *testing.T, quotaPerScore float64, dailyLimit int) {
 	t.Helper()
 	setting := operation_setting.GetMiniGameSetting()
 	previous := *setting
 	*setting = operation_setting.MiniGameSetting{
 		Enabled:             true,
 		TetrisEnabled:       true,
-		TetrisScorePerQuota: scorePerQuota,
+		TetrisQuotaPerScore: quotaPerScore,
 		DailyQuotaLimit:     dailyLimit,
 	}
 	t.Cleanup(func() {
@@ -37,14 +37,17 @@ func insertMiniGameUser(t *testing.T, id int, quota int) {
 
 func TestClaimMiniGameRewardCapsDailyLimitAndRejectsRepeatedSession(t *testing.T) {
 	truncateTables(t)
-	configureMiniGameForTest(t, 100, 5)
+	configureMiniGameForTest(t, 1, 5)
 	insertMiniGameUser(t, 301, 10)
 
 	session, err := StartMiniGameSession(301, MiniGameKeyTetris)
 	require.NoError(t, err)
 	require.NotEmpty(t, session.SessionToken)
+	require.NoError(t, DB.Model(&MiniGameSession{}).
+		Where("id = ?", session.Id).
+		Update("started_at", common.GetTimestamp()-180).Error)
 
-	play, stats, err := ClaimMiniGameReward(301, MiniGameKeyTetris, session.SessionToken, 900, 30)
+	play, stats, err := ClaimMiniGameReward(301, MiniGameKeyTetris, session.SessionToken, 900, 180)
 	require.NoError(t, err)
 	require.NotNil(t, play)
 	assert.Equal(t, 900, play.Score)
@@ -62,13 +65,36 @@ func TestClaimMiniGameRewardCapsDailyLimitAndRejectsRepeatedSession(t *testing.T
 
 	nextSession, err := StartMiniGameSession(301, MiniGameKeyTetris)
 	require.NoError(t, err)
-	_, _, err = ClaimMiniGameReward(301, MiniGameKeyTetris, nextSession.SessionToken, 100, 10)
+	require.NoError(t, DB.Model(&MiniGameSession{}).
+		Where("id = ?", nextSession.Id).
+		Update("started_at", common.GetTimestamp()-60).Error)
+	_, _, err = ClaimMiniGameReward(301, MiniGameKeyTetris, nextSession.SessionToken, 100, 60)
 	require.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "已达上限"))
 
 	var playCount int64
 	require.NoError(t, DB.Model(&MiniGamePlay{}).Where("user_id = ?", 301).Count(&playCount).Error)
 	assert.Equal(t, int64(1), playCount)
+}
+
+func TestClaimMiniGameRewardUsesQuotaPerScore(t *testing.T) {
+	truncateTables(t)
+	configureMiniGameForTest(t, 0.5, 100)
+	insertMiniGameUser(t, 302, 0)
+
+	session, err := StartMiniGameSession(302, MiniGameKeyTetris)
+	require.NoError(t, err)
+
+	play, stats, err := ClaimMiniGameReward(302, MiniGameKeyTetris, session.SessionToken, 7, 30)
+	require.NoError(t, err)
+	require.NotNil(t, play)
+	assert.Equal(t, 7, play.Score)
+	assert.Equal(t, 3, play.QuotaAwarded)
+	assert.Equal(t, int64(3), stats.QuotaAwarded)
+
+	var user User
+	require.NoError(t, DB.Select("quota").Where("id = ?", 302).First(&user).Error)
+	assert.Equal(t, 3, user.Quota)
 }
 
 func TestMiniGameBestRecordAndLeaderboardUseHighestScorePerUser(t *testing.T) {
